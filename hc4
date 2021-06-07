@@ -1,3 +1,4 @@
+/etc/netplan/01-network-manager-all.yaml
 network:
     ethernets:
         eth0:
