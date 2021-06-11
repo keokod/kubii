@@ -1,0 +1,8 @@
+lire température:
+vcgencmd measure_temp
+
+install aragon:
+curl https://download.argon40.com/argon1.sh | bash
+
+lancer la consigne de température:
+argonone-config
