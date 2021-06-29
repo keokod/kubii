@@ -1,7 +1,8 @@
 Pour que la carte démarre il faut obligatoirement flasher la micro sd avec la version jp451:
 https://developer.nvidia.com/jetson-nano-2gb-jp441-sd-card-image
 
-Au démarrage le fond doit être noir et le logo vert.
+Au démarrage le fond doit être noir et le logo vert le bureau ubuntu appararît environ 40 secondes.
+le test de démrrage peut se faire avec une micro SD de 12Go
 On doit avoir obligatoirement la page de présenation de ubuntu avec ommme choix en mode graphique:
 *******************************NVIDIA END USER Liscence agrements ****************************
 au niveau du formatage de la micro il est normal d'avoir 14 partition: mmcblk0p02 ....p014
