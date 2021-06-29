@@ -4,3 +4,4 @@ https://developer.nvidia.com/jetson-nano-2gb-jp441-sd-card-image
 Au démarrage le fond doit être noir et le logo vert.
 On doit avoir obligatoirement la page de présenation de ubuntu avec ommme choix en mode graphique:
 *******************************NVIDIA END USER Liscence agrements ****************************
+au niveau du formatage de la micro il est normal d'avoir 14 partition: mmcblk0p02 ....p014
