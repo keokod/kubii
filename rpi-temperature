@@ -3,3 +3,6 @@ https://www.raspberrypi.org/documentation/hardware/raspberrypi/frequency-managem
 
 la commande qui permet de mesurer la température du rpi:
 vcgencmd measure_temp
+
+test de température:
+https://www.raspberrypi.org/blog/thermal-testing-raspberry-pi-4/
