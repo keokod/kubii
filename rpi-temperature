@@ -6,3 +6,10 @@ vcgencmd measure_temp
 
 test de température:
 https://www.raspberrypi.org/blog/thermal-testing-raspberry-pi-4/
+
+test stress:
+sudo apt install stress-ng mesa-utils
+stress-ng --cpu 0 --cpu-method fft
+
+test d'animation
+glxgears -fullscreen si on fait un => vcgencmd measure_temp on obiten 52.1 degré à l'air libre
