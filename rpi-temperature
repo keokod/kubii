@@ -1,3 +1,5 @@
 Température max 85 degré rpi4
 https://www.raspberrypi.org/documentation/hardware/raspberrypi/frequency-management.md
 
+la commande qui permet de mesurer la température du rpi:
+vcgencmd measure_temp
