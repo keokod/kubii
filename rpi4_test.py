@@ -1,3 +1,5 @@
+raspistill -o image01.jpg -t 5000
+
 from gpiozero import LED
 from time import sleep
 pin3 = LED(2) #on branche une led sur la patte gpio2 et la variable se nomme pin3 broche n3 
