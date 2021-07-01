@@ -13,5 +13,12 @@ apt-get install avahi-daemon avahi-discover libnss-mdns
 Connecter la micro-sd brancher la micro-usb et le cable hdmi (moyen).
 attendre environ 40 secondes, puis relever de suite son adresse ip qui change sans cesse. (exemple : 169.254.168.41)
 
+changer l'adresse ip du client en ip fixe et pinger la nouvelle adresse.
+
+lenovo@lenovo:~$ ssh pi@169.254.168.41
+The authenticity of host '169.254.168.41 (169.254.168.41)' can't be established.
+ECDSA key fingerprint is SHA256:3Yhqq3tmJxqWANY1uTCZ
+
+valider yes, puis mettre le mot de passe: raspberry
 
 
