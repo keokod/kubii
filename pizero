@@ -21,4 +21,7 @@ ECDSA key fingerprint is SHA256:3Yhqq3tmJxqWANY1uTCZ
 
 valider yes, puis mettre le mot de passe: raspberry
 
+test camera:
+
+raspistill -o image01.jpg -t 5000
 
