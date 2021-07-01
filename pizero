@@ -1,3 +1,5 @@
+Dans la carte micro sd dans la partition boot (et pas le dossier) creer un fichier ssh sans extension
+
 editer à la racine le fichier config.txt :
 
 dtoverlay=dwc2
@@ -7,3 +9,9 @@ console=serial0,115200 console=tty1 root=PARTUUID=30319418-02 rootfstype=ext4 el
 
 installer "bonjour service" pour avoir l'usb rnis
 apt-get install avahi-daemon avahi-discover libnss-mdns
+
+Connecter la micro-sd brancher la micro-usb et le cable hdmi (moyen).
+attendre environ 40 secondes, puis relever de suite son adresse ip qui change sans cesse. (exemple : 169.254.168.41)
+
+
+
