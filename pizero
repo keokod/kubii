@@ -1,5 +1,5 @@
 Dans la carte micro sd dans la partition boot (et pas le dossier) creer un fichier ssh sans extension
-
+(sous debian côte client)
 editer à la racine le fichier config.txt :
 
 dtoverlay=dwc2
