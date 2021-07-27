@@ -6,4 +6,3 @@ t
 5 - la touchette est en minuscule donc caractère à la place des chiffre, exécuter en ligne de commande: setxkbmap -option caps:shiftlock
 puis ne pas oublié de mettre la touche en majusucle pour avoir les chiffres avec la douchette
 
-
