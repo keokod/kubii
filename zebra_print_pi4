@@ -3,6 +3,7 @@ t
 2- configurer set wlan country (reboot)
 3 - configurer le password admi pi en guit (après mise à jour automatique)
 4 -  dans administration ajouter imprmante , choisir zebra dans la liste, une fois valider choisir zebra  ZPL
-
+5 - la touchette est en minuscule donc caractère à la place des chiffre, exécuter en ligne de commande: setxkbmap -option caps:shiftlock
+puis ne pas oublié de mettre la touche en majusucle pour avoir les chiffres avec la douchette
 
 
