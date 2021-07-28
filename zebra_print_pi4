@@ -5,4 +5,6 @@ t
 4 -  dans administration ajouter imprmante , choisir zebra dans la liste, une fois valider choisir zebra  ZPL
 5 - la touchette est en minuscule donc caractère à la place des chiffre, exécuter en ligne de commande: setxkbmap -option caps:shiftlock
 puis ne pas oublié de mettre la touche en majusucle pour avoir les chiffres avec la douchette
+6 - dans imprimante -> lien zebra-technologie-ztc choisir le menu déroulant -> definir option imprimante
+7 - taile papier prendre 2.00 x 1.25 "
 
