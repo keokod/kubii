@@ -1,3 +1,16 @@
+config wifi:
+sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+
+country=FR
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+network={
+  ssid="NOM_RESEAU"
+  scan_ssid=1
+  psk="MOTDEPASSE"
+  key_mgmt=WPA-PSK
+}
+
 Dans la carte micro sd dans la partition boot (et pas le dossier) creer un fichier ssh sans extension
 (sous debian côte client)
 editer à la racine le fichier config.txt :
