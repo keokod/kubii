@@ -4,7 +4,8 @@ télécharger uniquement cette version:
 
 https://downloads.raspberrypi.org/raspios_armhf/images/raspios_armhf-2020-08-24/
 flasher la sd
-
+- SIM8200EA-M2 x1
+- SIMXXXX-M2 4G/5G HAT base x1
 - 2 plaques
 - 5 antennes
 - 5 fil antennes
@@ -13,3 +14,5 @@ flasher la sd
 - 4 ecrou m3 
 - 4 vice M
 - 4 rondelle m3 blanc
+- 1 cable usb3/usb3
+
