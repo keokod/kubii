@@ -1,4 +1,6 @@
 #!/bin/bash
+#faire un sudo apt-get install sysbench
+#créer l'executable supply.sh rendre exécutable chmod +x./supply.sh
 
 # Before running this script, make sure you have sysbench installed:
 #           sudo apt-get install sysbench
