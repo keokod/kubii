@@ -1,7 +1,7 @@
 #!/bin/bash
 #faire un sudo apt-get install sysbench
 #créer l'executable supply.sh rendre exécutable chmod +x./supply.sh
-
+#https://qengineering.eu/overclocking-the-raspberry-pi-4.html
 # Before running this script, make sure you have sysbench installed:
 #           sudo apt-get install sysbench
 #
