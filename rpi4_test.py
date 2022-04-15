@@ -1,4 +1,5 @@
 raspistill -o image01.jpg -t 5000
+libcamera-hello
 
 from gpiozero import LED
 from time import sleep
