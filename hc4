@@ -1,3 +1,9 @@
+#$ echo 30000 | sudo tee /sys/devices/virtual/thermal/thermal_zone{0,1,2,3}/trip_point_0_temp
+#$ cat /sys/devices/virtual/thermal/thermal_zone{0,1,2,3}/trip_point_0_temp
+# results
+#30000
+
+
 /etc/netplan/01-network-manager-all.yaml
 network:
     ethernets:
@@ -9,3 +15,4 @@ network:
             dhcp4: false
             dhcp6: false
     version: 2
+
