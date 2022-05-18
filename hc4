@@ -1,3 +1,11 @@
+#test
+-Graver la microSD => insertion automatique du fichier spiboot.img pour mettre à jour petit boot
+-mise sous tension 12V , sans appuyer sur le bouton reset
+-message à l'écran:mise à jour u-boot
+-reboot automatique
+
+appuyer sur reste pour démarrer petit boot
+
 #$ echo 30000 | sudo tee /sys/devices/virtual/thermal/thermal_zone{0,1,2,3}/trip_point_0_temp
 #$ cat /sys/devices/virtual/thermal/thermal_zone{0,1,2,3}/trip_point_0_temp
 # results
