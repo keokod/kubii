@@ -1,2 +1,3 @@
 Consommation à vide odroid M1 :
 12V => 130mA , led rouge fixe => led bleu clignote
+démarrag avec page de présentation petit boot => petit_bootM1.jpg
