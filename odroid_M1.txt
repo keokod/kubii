@@ -1,1 +1,2 @@
-
+Consommation à vide odroid M1 :
+12V => 130mA , led rouge fixe => led bleu clignote
