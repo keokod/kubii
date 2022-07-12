@@ -1,3 +1,5 @@
+#pour installer circup installer pyton avec le store de microsoft pour une configuration facile
+
 PS C:\Users\PC-HOME\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\Scripts> .\circup.exe show bme  
 Downloading latest version for adafruit/Adafruit_CircuitPython_Bundle.
 
