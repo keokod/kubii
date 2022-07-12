@@ -1,0 +1,29 @@
+PS C:\Users\PC-HOME\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\Scripts> .\circup.exe show bme  
+Downloading latest version for adafruit/Adafruit_CircuitPython_Bundle.
+
+  [####################################]  100%
+  [####################################]  100%
+  [####################################]  100%
+
+OK
+
+Downloading latest version for adafruit/CircuitPython_Community_Bundle.
+
+  [####################################]  100%
+  [####################################]  100%
+  [####################################]  100%
+
+OK
+
+Downloading latest version for circuitpython/CircuitPython_Org_Bundle.
+
+  [####################################]  100%
+  [####################################]  100%
+  [####################################]  100%
+
+OK
+
+adafruit_bme280
+adafruit_bme680
+2 shown of 358 packages.
+PS C:\Users\PC-HOME\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\Scripts> 
