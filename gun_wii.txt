@@ -1,0 +1,4 @@
+light gun
+
+https://wiki.recalbox.com/fr/basic-usage/features/lightgun-on-recalbox/games-compatibility-list
+https://wiki.recalbox.com/fr/basic-usage/features/lightgun-on-recalbox/calibration/with-naomi-game
