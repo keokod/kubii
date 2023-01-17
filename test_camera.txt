@@ -1,0 +1,14 @@
+vcgencmd get_camera #supported=0 detected=0, libcamera interfaces=0
+config.txt:
+
+camera_auto_detect=1
+#camera pour la ptz zoom mecanique
+#disable_camera_led=1
+#camera_auto_detect=1
+#disable_camera_led=1
+#dtoverlay=imx219
+
+
+camera V3
+
+dtoverlay=ov5647
