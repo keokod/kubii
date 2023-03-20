@@ -16,6 +16,17 @@ i2cdetecte -y 1
   50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
   60: -- -- -- -- -- -- -- -- 68 -- -- -- -- -- -- -- 
   70: -- -- -- -- -- -- -- --
+  
+  lire registre configuration température:
+  i2cset -y 1 0x68 0x6B 0x01
+  
+  configuration en mode 2G
+  i2cset -y 1 0x68 0x1C 0x00
+  
+  lire l'axe Z:
+  i2cget -y 1 0x68 0x3F w
+  
+  
 
 
 https://openest.io/en/services/mpu6050-accelerometer-on-raspberry-pi/
