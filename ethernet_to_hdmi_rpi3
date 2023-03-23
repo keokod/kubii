@@ -32,8 +32,24 @@ static_lease b8:27:eb:07:01:d7 10.0.0.1
 9 - redémarrer le DHCP: sudo systemctl restart udhcpd (pour confirmer la console demande le mot de passe pi)
 10 - pour le test fixer l'adresse ip :
 ifconfig eth0 10.0.0.1 netmask 255.255.255.0
+
 11 - vérifier que l'adresse ip est bien 10.0.0.1
+12 - pinger le client et le serveur : ping 10.0.0.1 (client => serveur), ping 10.0.0.2 (serveur => client)
+
+si le ping client fonctionne pas vérifier la config 
+ipv4 : 10.0.0.2
+Router: 10.0.0.1
+DNS Server: 10.0.0.1
+
+
 12 - lancer le serveur stream : mpv --hwdec=drm "tcp://10.0.0.1:1234?listen"
+
+du côté client qui va utiliser le hdmi du rpi3 :
+13 installer ffmpeg côté client : sudo apt-get install ffmpeg
+14 demander le flux du serveur avec la commande : ffmpeg -video_size 1920x1080 -framerate 5 -f x11grab -i :0.0+0x0 -f mpegts tcp://10.0.0.1:1234
+
+attendre 3 bonne minutes le temps que le rpi3 stream et sort sur le HDMI
+vérifier que le moniteur est branché sur le rpi3 et l'image du client devrais s'afficher
 
 
 
