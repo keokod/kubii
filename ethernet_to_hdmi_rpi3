@@ -14,3 +14,27 @@ exemple :
 inet6 ------------------0x20<link>
 ether b8:27:eb:07:01:d7 txqueulen
 
+7 - editer le fichier udhcpd : sudo nano /etc/udhcpd.conf
+
+#modifier cette ligne:
+start 10.0.0.1
+end 10.0.0.2
+
+# Various options
+option subnet 255.255.255.252
+option domain hdmi
+option lease  60  # One minute lease
+
+#prendre l'adresse MAC
+static_lease b8:27:eb:07:01:d7 10.0.0.1
+
+8 - activer le DHCP : sudo systemctl enable udhcpd
+9 - redémarrer le DHCP: sudo systemctl restart udhcpd (pour confirmer la console demande le mot de passe pi)
+10 - pour le test fixer l'adresse ip :
+ifconfig eth0 10.0.0.1 netmask 255.255.255.0
+11 - vérifier que l'adresse ip est bien 10.0.0.1
+12 - lancer le serveur stream : mpv --hwdec=drm "tcp://10.0.0.1:1234?listen"
+
+
+
+
