@@ -1,1 +1,16 @@
+métériel nécessaire pour dérouter le port HDMI rpi3 en sortie streamer :
+
+A => rpi3 dont l'adresse ip est 10.0.0.1 avec la fonction DHCP
+B => rpi3 dont l'adresse ip et 10.0.0.2 , pour accéder en tant que client ffmg (ffmpeg)
+
+
+1 - créer avec rpi-imager un sd boot bullseye version sans destop , version 2023
+2 - booter le bullseye sur le rpi3
+3 - mettre à jour sudo apt-get update 
+4 - installer ffmpeg avec la commande : sudo apt-get install mpv ffmpeg
+5 - installer serveur dhcp : sudo apt-get install udhcpd
+6 - faire un ip config et récupérer l'adresse MAC: 
+exemple :
+inet6 ------------------0x20<link>
+ether b8:27:eb:07:01:d7 txqueulen
 
