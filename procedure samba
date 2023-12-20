@@ -1,0 +1,11 @@
+https://www.raspberrypi.com/documentation/computers/remote-access.html
+
+samba client: 
+
+sudo apt update
+sudo apt install samba samba-common-bin smbclient cifs-utils
+mkdir windowshare
+
+dans windows récupérer le nom du serveur samba exemple serveur-samba (vue sur l'icone réseaux de l'explorateur de windows
+sudo mount.cifs //192.168.1.XX/server-samba /home/pi/partage-rpi4 -o user=mdp-rppi4
+
