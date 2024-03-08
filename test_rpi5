@@ -1,0 +1,6 @@
+test ventillateur on/off
+
+OFF:
+pinctrl FAN_PWM op dh
+ON:
+pinctrl FAN_PWM op dl
