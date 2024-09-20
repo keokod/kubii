@@ -4,3 +4,23 @@ OFF:
 pinctrl FAN_PWM op dh
 ON:
 pinctrl FAN_PWM op dl
+
+#permet de connaître les port gpio:
+sudo gpioinfo gpiochip4
+
+#faire clignoter le rpi5 en bash:
+echo gpio2_on
+pinctrl set 2 op dh
+sleep 1
+
+echo gpio2_off
+pinctrl set 2 op dl
+sleep 1
+
+echo gpio2_on
+pinctrl set 2 op dh
+sleep 1
+
+echo gpio2_off
+pinctrl set 2 op dl
+sleep 1
