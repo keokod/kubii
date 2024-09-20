@@ -166,3 +166,16 @@ while True:
     sleep(0.3)
     pin8.off()
     sleep(0.3)
+
+#test simple sur le gpio en ligne de commande avec le rpi5:
+pinctrl set 2 op dh #met le gpio2 en hight 3.3V
+pinctrl set 2 op dh #met le gpio2 en low 0V
+
+#test gpio avec un raspberry pi 5
+#utiliser pip pour installer libgpiod-dev et python3
+sudo apt install libgpiod-dev python3-libgpiod
+#voir le status gpiod:
+sudo systemctl start pigpiod
+sudo systemctl status pigpiod
+
+
