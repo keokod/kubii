@@ -1,0 +1,583 @@
+//recpetion raspberry pi
+#!/usr/bin/env python3
+
+import RPi.GPIO as GPIO
+import socket
+import time
+
+
+PORT = 5000
+
+#!/usr/bin/env python3
+
+import RPi.GPIO as GPIO
+import socket
+import time
+import threading
+
+
+DEST_IP = "192.168.10.2"
+PORT = 5000
+
+
+GPIO_LIST = [
+    4,5,6,
+    12,13,
+    16,17,18,19,20,21,
+    22,23,24,25,26,27
+]
+
+
+NOMBRE_BOUCLES = 2
+
+
+GPIO.setmode(GPIO.BCM)
+
+
+sock = socket.socket(
+    socket.AF_INET,
+    socket.SOCK_DGRAM
+)
+
+
+resultats = {}
+
+
+
+def signal_100hz(gpio):
+
+    GPIO.setup(
+        gpio,
+        GPIO.OUT
+    )
+
+    fin = time.time() + 1
+
+    while time.time() < fin:
+
+        GPIO.output(gpio, GPIO.HIGH)
+        time.sleep(0.005)
+
+        GPIO.output(gpio, GPIO.LOW)
+        time.sleep(0.005)
+
+
+
+try:
+
+
+    for boucle in range(1, NOMBRE_BOUCLES + 1):
+
+
+        print("\n================")
+        print("BOUCLE", boucle)
+        print("================")
+
+
+        for gpio in GPIO_LIST:
+
+
+            print("\nTest GPIO", gpio)
+
+
+            # démarre le 100 Hz
+            t = threading.Thread(
+                target=signal_100hz,
+                args=(gpio,)
+            )
+
+            t.start()
+
+
+            time.sleep(0.1)
+
+
+            # envoie le numéro GPIO
+            msg = f"GPIO:{gpio}"
+
+
+            sock.sendto(
+                msg.encode(),
+                (DEST_IP, PORT)
+            )
+
+
+            # réponse du Pi2
+            data, addr = sock.recvfrom(1024)
+
+
+            reponse = data.decode()
+
+
+            print(reponse)
+
+
+
+            if "OK" in reponse:
+
+                resultats[gpio] = "OK"
+
+            else:
+
+                resultats[gpio] = "ERREUR"
+
+
+
+            t.join()
+
+            GPIO.output(
+                gpio,
+                GPIO.LOW
+            )
+
+            time.sleep(0.2)
+
+
+
+finally:
+
+
+    GPIO.cleanup()
+    sock.close()
+
+
+
+print("\n\n===== TABLEAU FINAL =====")
+
+
+print("GPIO\tRESULTAT")
+
+print("------------------------")
+
+
+for gpio in GPIO_LIST:
+
+    print(
+        f"{gpio}\t{resultats.get(gpio,'?')}"
+    )
+
+
+print("========================")
+
+GPIO.setmode(GPIO.BCM)
+
+
+sock = socket.socket(
+    socket.AF_INET,
+    socket.SOCK_DGRAM
+)
+
+
+sock.bind(
+    ("0.0.0.0", PORT)
+)
+
+
+print("Récepteur prêt")
+
+
+
+def mesurer_gpio(gpio):
+
+    compteur = 0
+
+
+    def front(channel):
+
+        nonlocal compteur
+        compteur += 1
+
+
+
+    GPIO.setup(
+        gpio,
+        GPIO.IN
+    )
+
+
+    GPIO.add_event_detect(
+        gpio,
+        GPIO.RISING,
+        callback=front
+    )
+
+
+    time.sleep(1)
+
+
+    GPIO.remove_event_detect(
+        gpio
+    )
+
+
+    return compteur
+
+
+
+
+while True:
+
+
+    data, addr = sock.recvfrom(1024)
+
+
+    msg = data.decode()
+
+
+    print("\nMessage reçu :", msg)
+
+
+    gpio = int(
+        msg.split(":")[1]
+    )
+
+
+    fronts = mesurer_gpio(gpio)
+
+
+    print(
+        f"GPIO {gpio} : {fronts} fronts"
+    )
+
+
+
+    if 80 <= fronts <= 120:
+
+
+        reponse = (
+            f"OK GPIO {gpio} "
+            f"({fronts} fronts)"
+        )
+
+
+    else:
+
+
+        reponse = (
+            f"ERREUR GPIO {gpio} "
+            f"({fronts} fronts)"
+        )
+
+
+
+    sock.sendto(
+        reponse.encode(),
+        addr
+    )
+
+
+    print(reponse)
+
+//emission raspberry pi gpio
+#!/usr/bin/env python3
+
+import RPi.GPIO as GPIO
+import socket
+import time
+import threading
+
+
+DEST_IP = "192.168.10.2"
+PORT = 5000
+
+
+GPIO_LIST = [
+    4,5,6,
+    12,13,
+    16,17,18,19,20,21,
+    22,23,24,25,26,27
+]
+
+
+NOMBRE_BOUCLES = 2
+
+
+GPIO.setmode(GPIO.BCM)
+
+
+sock = socket.socket(
+    socket.AF_INET,
+    socket.SOCK_DGRAM
+)
+
+
+resultats = {}
+
+
+
+def signal_100hz(gpio):
+
+    GPIO.setup(
+        gpio,
+        GPIO.OUT
+    )
+
+    fin = time.time() + 1
+
+    while time.time() < fin:
+
+        GPIO.output(gpio, GPIO.HIGH)
+        time.sleep(0.005)
+
+        GPIO.output(gpio, GPIO.LOW)
+        time.sleep(0.005)
+
+
+
+try:
+
+
+    for boucle in range(1, NOMBRE_BOUCLES + 1):
+
+
+        print("\n================")
+        print("BOUCLE", boucle)
+        print("================")
+
+
+        for gpio in GPIO_LIST:
+
+
+            print("\nTest GPIO", gpio)
+
+
+            # démarre le 100 Hz
+            t = threading.Thread(
+                target=signal_100hz,
+                args=(gpio,)
+            )
+
+            t.start()
+
+
+            time.sleep(0.1)
+
+
+            # envoie le numéro GPIO
+            msg = f"GPIO:{gpio}"
+
+
+            sock.sendto(
+                msg.encode(),
+                (DEST_IP, PORT)
+            )
+
+
+            # réponse du Pi2
+            data, addr = sock.recvfrom(1024)
+
+
+            reponse = data.decode()
+
+
+            print(reponse)
+
+
+
+            if "OK" in reponse:
+
+                resultats[gpio] = "OK"
+
+            else:
+
+                resultats[gpio] = "ERREUR"
+
+
+
+            t.join()
+
+            GPIO.output(
+                gpio,
+                GPIO.LOW
+            )
+
+            time.sleep(0.2)
+
+
+
+finally:
+
+
+    GPIO.cleanup()
+    sock.close()
+
+
+
+print("\n\n===== TABLEAU FINAL =====")
+
+
+print("GPIO\tRESULTAT")
+
+print("------------------------")
+
+
+for gpio in GPIO_LIST:
+
+    print(
+        f"{gpio}\t{resultats.get(gpio,'?')}"
+    )
+
+#!/usr/bin/env python3
+
+import RPi.GPIO as GPIO
+import socket
+import time
+import threading
+
+
+DEST_IP = "192.168.10.2"
+PORT = 5000
+
+
+GPIO_LIST = [
+    4,5,6,
+    12,13,
+    16,17,18,19,20,21,
+    22,23,24,25,26,27
+]
+
+
+NOMBRE_BOUCLES = 2
+
+
+GPIO.setmode(GPIO.BCM)
+
+
+sock = socket.socket(
+    socket.AF_INET,
+    socket.SOCK_DGRAM
+)
+
+
+resultats = {}
+
+
+
+def signal_100hz(gpio):
+
+    GPIO.setup(
+        gpio,
+        GPIO.OUT
+    )
+
+    fin = time.time() + 1
+
+    while time.time() < fin:
+
+        GPIO.output(gpio, GPIO.HIGH)
+        time.sleep(0.005)
+
+        GPIO.output(gpio, GPIO.LOW)
+        time.sleep(0.005)
+
+
+
+try:
+
+
+    for boucle in range(1, NOMBRE_BOUCLES + 1):
+
+
+        print("\n================")
+        print("BOUCLE", boucle)
+        print("================")
+
+
+        for gpio in GPIO_LIST:
+
+
+            print("\nTest GPIO", gpio)
+
+
+            # démarre le 100 Hz
+            t = threading.Thread(
+                target=signal_100hz,
+                args=(gpio,)
+            )
+
+            t.start()
+
+
+            time.sleep(0.1)
+
+
+            # envoie le numéro GPIO
+            msg = f"GPIO:{gpio}"
+
+
+            sock.sendto(
+                msg.encode(),
+                (DEST_IP, PORT)
+            )
+
+
+            # réponse du Pi2
+            data, addr = sock.recvfrom(1024)
+
+
+            reponse = data.decode()
+
+
+            print(reponse)
+
+
+
+            if "OK" in reponse:
+
+                resultats[gpio] = "OK"
+
+            else:
+
+                resultats[gpio] = "ERREUR"
+
+
+
+            t.join()
+
+            GPIO.output(
+                gpio,
+                GPIO.LOW
+            )
+
+            time.sleep(0.2)
+
+
+
+finally:
+
+
+    GPIO.cleanup()
+    sock.close()
+
+
+
+print("\n\n===== TABLEAU FINAL =====")
+
+
+print("GPIO\tRESULTAT")
+
+print("------------------------")
+
+
+for gpio in GPIO_LIST:
+
+    print(
+        f"{gpio}\t{resultats.get(gpio,'?')}"
+    )
+
+
+print("========================")
+
+print("========================")
+
+/* configurer le raspberry pi en directe :
+sudo nmcli connection modify "Connexion filaire 1" \
+ipv4.method manual \
+ipv4.addresses 192.168.10.1/24 \
+ipv4.gateway ""
+
+sudo nmcli connection down "Connexion filaire 1"
+sudo nmcli connection up "Connexion filaire 1"
+
+
+
