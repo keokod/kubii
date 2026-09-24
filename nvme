@@ -1,0 +1,51 @@
+erase sh nvme:
+
+cat > check_nvme.sh <<'EOF'
+#!/bin/bash
+
+set -u
+
+DISK="/dev/nvme0n1"
+
+echo "========================================"
+echo " Vérification du NVMe : $DISK"
+echo "========================================"
+echo
+
+if [ ! -b "$DISK" ]; then
+    echo "ERREUR : $DISK n'existe pas."
+    exit 1
+fi
+
+echo "[1] Informations du disque"
+lsblk -o NAME,SIZE,MODEL,FSTYPE,FSVER,LABEL,UUID,MOUNTPOINTS "$DISK"
+echo
+
+echo "[2] Table de partitions"
+sudo fdisk -l "$DISK"
+echo
+
+echo "[3] Signatures détectées (aucune modification)"
+sudo wipefs -n "$DISK"
+echo
+
+echo "========================================"
+echo " Résultat"
+echo "========================================"
+
+PARTITIONS=$(lsblk -ln "$DISK" -o NAME | tail -n +2)
+
+if [ -z "$PARTITIONS" ]; then
+    echo "OK : aucune partition détectée."
+else
+    echo "ATTENTION : des partitions sont présentes :"
+    echo "$PARTITIONS"
+fi
+
+echo
+echo "IMPORTANT : ce script n'efface aucune donnée."
+echo
+EOF
+
+chmod +x check_nvme.sh
+./check_nvme.sh
