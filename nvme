@@ -1,51 +1,124 @@
-erase sh nvme:
-
-cat > check_nvme.sh <<'EOF'
+cat > erase_nvme.sh <<'EOF'
 #!/bin/bash
 
 set -u
 
 DISK="/dev/nvme0n1"
+CTRL="/dev/nvme0"
 
-echo "========================================"
-echo " Vérification du NVMe : $DISK"
-echo "========================================"
+echo "=================================================="
+echo "       EFFACEMENT DEFINITIF DU NVMe"
+echo "=================================================="
+echo
+echo "Disque  : $DISK"
+echo "Contrôleur : $CTRL"
+echo
+echo "!!! TOUTES LES DONNÉES SERONT DÉTRUITES !!!"
 echo
 
+# Vérifications
 if [ ! -b "$DISK" ]; then
     echo "ERREUR : $DISK n'existe pas."
     exit 1
 fi
 
-echo "[1] Informations du disque"
-lsblk -o NAME,SIZE,MODEL,FSTYPE,FSVER,LABEL,UUID,MOUNTPOINTS "$DISK"
+if [ ! -c "$CTRL" ]; then
+    echo "ERREUR : $CTRL n'existe pas."
+    exit 1
+fi
+
+echo "[1] Disque détecté :"
+lsblk -o NAME,SIZE,MODEL,SERIAL,FSTYPE,MOUNTPOINTS "$DISK"
 echo
 
-echo "[2] Table de partitions"
-sudo fdisk -l "$DISK"
+echo "=================================================="
+echo "ATTENTION : cette opération est IRRÉVERSIBLE."
+echo "=================================================="
 echo
+read -r -p "Tapez exactement EFFACER pour continuer : " CONFIRMATION
 
-echo "[3] Signatures détectées (aucune modification)"
-sudo wipefs -n "$DISK"
-echo
-
-echo "========================================"
-echo " Résultat"
-echo "========================================"
-
-PARTITIONS=$(lsblk -ln "$DISK" -o NAME | tail -n +2)
-
-if [ -z "$PARTITIONS" ]; then
-    echo "OK : aucune partition détectée."
-else
-    echo "ATTENTION : des partitions sont présentes :"
-    echo "$PARTITIONS"
+if [ "$CONFIRMATION" != "EFFACER" ]; then
+    echo
+    echo "Annulation."
+    exit 0
 fi
 
 echo
-echo "IMPORTANT : ce script n'efface aucune donnée."
+echo "[2] Vérification des systèmes de fichiers montés..."
+
+MOUNTS=$(lsblk -nr -o MOUNTPOINT "$DISK" | sed '/^$/d')
+
+if [ -n "$MOUNTS" ]; then
+    echo
+    echo "ERREUR : des partitions de ce NVMe sont montées :"
+    echo "$MOUNTS"
+    echo
+    echo "Démontez-les avant de continuer."
+    exit 1
+fi
+
+echo "OK : aucune partition montée."
 echo
+
+# Vérifier que nvme-cli est disponible
+if ! command -v nvme >/dev/null 2>&1; then
+    echo "ERREUR : nvme-cli n'est pas installé."
+    echo
+    echo "Sur Debian/Ubuntu :"
+    echo "  sudo apt install nvme-cli"
+    exit 1
+fi
+
+echo "[3] Capacités Sanitize du contrôleur :"
+nvme id-ctrl "$CTRL" | grep -Ei 'sanitize|sanicap|oacs' || true
+echo
+
+echo "=================================================="
+echo "Lancement du NVMe Sanitize"
+echo "=================================================="
+echo
+echo "Méthode : Crypto Erase"
+echo
+echo "Le contrôleur va effectuer une opération"
+echo "d'effacement cryptographique si elle est supportée."
+echo
+
+read -r -p "Tapez encore une fois EFFACER pour lancer : " CONFIRMATION
+
+if [ "$CONFIRMATION" != "EFFACER" ]; then
+    echo "Annulation."
+    exit 0
+fi
+
+echo
+echo ">>> SANITIZE EN COURS..."
+echo ">>> NE PAS ÉTEINDRE LE PC."
+echo
+
+if sudo nvme sanitize "$CTRL" --sanact=start-crypto-erase --wait; then
+    echo
+    echo "=================================================="
+    echo "SANITIZE TERMINÉ AVEC SUCCÈS"
+    echo "=================================================="
+else
+    echo
+    echo "=================================================="
+    echo "ERREUR : le Sanitize a échoué ou n'est pas supporté."
+    echo "=================================================="
+    echo
+    echo "Consultez le journal Sanitize avec :"
+    echo "  sudo nvme sanitize-log $CTRL"
+    echo
+    exit 1
+fi
+
+echo
+echo "Vérification finale :"
+sudo nvme sanitize-log "$CTRL" || true
+
+echo
+echo "Terminé."
 EOF
 
-chmod +x check_nvme.sh
-./check_nvme.sh
+chmod +x erase_nvme.sh
+sudo ./erase_nvme.sh
