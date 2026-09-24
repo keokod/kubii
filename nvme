@@ -7,16 +7,23 @@ DISK="/dev/nvme0n1"
 CTRL="/dev/nvme0"
 
 echo "=================================================="
-echo "       EFFACEMENT DEFINITIF DU NVMe"
+echo "       EFFACEMENT COMPLET DU NVMe"
 echo "=================================================="
 echo
-echo "Disque  : $DISK"
-echo "Contrôleur : $CTRL"
-echo
-echo "!!! TOUTES LES DONNÉES SERONT DÉTRUITES !!!"
+echo "Disque      : $DISK"
+echo "Contrôleur  : $CTRL"
 echo
 
-# Vérifications
+# --------------------------------------------------
+# Vérifications de base
+# --------------------------------------------------
+
+if [ "$EUID" -ne 0 ]; then
+    echo "ERREUR : lance ce script avec sudo."
+    echo "Exemple : sudo ./erase_nvme.sh"
+    exit 1
+fi
+
 if [ ! -b "$DISK" ]; then
     echo "ERREUR : $DISK n'existe pas."
     exit 1
@@ -27,98 +34,228 @@ if [ ! -c "$CTRL" ]; then
     exit 1
 fi
 
-echo "[1] Disque détecté :"
-lsblk -o NAME,SIZE,MODEL,SERIAL,FSTYPE,MOUNTPOINTS "$DISK"
-echo
-
-echo "=================================================="
-echo "ATTENTION : cette opération est IRRÉVERSIBLE."
-echo "=================================================="
-echo
-read -r -p "Tapez exactement EFFACER pour continuer : " CONFIRMATION
-
-if [ "$CONFIRMATION" != "EFFACER" ]; then
+if ! command -v nvme >/dev/null 2>&1; then
+    echo "ERREUR : nvme-cli n'est pas installé."
     echo
-    echo "Annulation."
-    exit 0
+    echo "Installation :"
+    echo "  apt install nvme-cli"
+    exit 1
 fi
 
+# --------------------------------------------------
+# Identification du disque
+# --------------------------------------------------
+
+echo "[1/7] Identification du NVMe"
 echo
-echo "[2] Vérification des systèmes de fichiers montés..."
+
+lsblk -o NAME,SIZE,MODEL,SERIAL,FSTYPE,MOUNTPOINTS "$DISK"
+
+echo
+
+MODEL=$(lsblk -dn -o MODEL "$DISK" | xargs)
+SERIAL=$(lsblk -dn -o SERIAL "$DISK" | xargs)
+SIZE=$(lsblk -dn -o SIZE "$DISK" | xargs)
+
+echo "Modèle  : $MODEL"
+echo "Série   : $SERIAL"
+echo "Taille  : $SIZE"
+echo
+
+# --------------------------------------------------
+# Vérification du système actuel
+# --------------------------------------------------
+
+echo "[2/7] Vérification du système actuel"
+echo
+
+ROOTDEV=$(findmnt -n -o SOURCE /)
+
+echo "Racine / : $ROOTDEV"
+
+case "$ROOTDEV" in
+    /dev/mmcblk*)
+        echo "OK : le système tourne depuis mmcblk."
+        ;;
+    /dev/nvme*)
+        echo
+        echo "ERREUR CRITIQUE :"
+        echo "Le système actuel tourne depuis le NVMe."
+        echo "Impossible de l'effacer depuis ce système."
+        exit 1
+        ;;
+    *)
+        echo
+        echo "ATTENTION : système racine détecté sur : $ROOTDEV"
+        echo "Le script refuse de continuer par sécurité."
+        exit 1
+        ;;
+esac
+
+echo
+
+# --------------------------------------------------
+# Vérification des partitions montées
+# --------------------------------------------------
+
+echo "[3/7] Vérification des partitions montées"
+echo
 
 MOUNTS=$(lsblk -nr -o MOUNTPOINT "$DISK" | sed '/^$/d')
 
 if [ -n "$MOUNTS" ]; then
+    echo "ERREUR : une partition du NVMe est montée :"
     echo
-    echo "ERREUR : des partitions de ce NVMe sont montées :"
     echo "$MOUNTS"
     echo
-    echo "Démontez-les avant de continuer."
+    echo "Démonte-la avant de continuer."
     exit 1
 fi
 
-echo "OK : aucune partition montée."
+echo "OK : aucune partition du NVMe n'est montée."
 echo
 
-# Vérifier que nvme-cli est disponible
-if ! command -v nvme >/dev/null 2>&1; then
-    echo "ERREUR : nvme-cli n'est pas installé."
+# --------------------------------------------------
+# Vérification des capacités NVMe
+# --------------------------------------------------
+
+echo "[4/7] Vérification des capacités NVMe"
+echo
+
+IDCTRL=$(nvme id-ctrl "$CTRL")
+
+SANICAP=$(printf '%s\n' "$IDCTRL" | awk '/^[[:space:]]*sanicap[[:space:]]*:/ {print $3}')
+FNA=$(printf '%s\n' "$IDCTRL" | awk '/^[[:space:]]*fna[[:space:]]*:/ {print $3}')
+
+echo "SANICAP : ${SANICAP:-inconnu}"
+echo "FNA     : ${FNA:-inconnu}"
+echo
+
+if [ "${SANICAP:-}" = "0" ]; then
+    echo "INFO : NVMe Sanitize n'est pas supporté."
+    echo "      Utilisation de NVMe Format / Cryptographic Erase."
     echo
-    echo "Sur Debian/Ubuntu :"
-    echo "  sudo apt install nvme-cli"
+fi
+
+if [ "${FNA:-}" != "0x1" ]; then
+    echo
+    echo "ERREUR : FNA ne confirme pas le support attendu."
+    echo "Valeur détectée : ${FNA:-inconnue}"
     exit 1
 fi
 
-echo "[3] Capacités Sanitize du contrôleur :"
-nvme id-ctrl "$CTRL" | grep -Ei 'sanitize|sanicap|oacs' || true
+echo "OK : Secure Erase via NVMe Format disponible."
 echo
+
+# --------------------------------------------------
+# Confirmation utilisateur
+# --------------------------------------------------
 
 echo "=================================================="
-echo "Lancement du NVMe Sanitize"
+echo "              ATTENTION !!!"
 echo "=================================================="
 echo
-echo "Méthode : Crypto Erase"
+echo "Le disque suivant va être EFFACÉ :"
 echo
-echo "Le contrôleur va effectuer une opération"
-echo "d'effacement cryptographique si elle est supportée."
+echo "  $DISK"
+echo "  Modèle : $MODEL"
+echo "  Série  : $SERIAL"
+echo "  Taille : $SIZE"
+echo
+echo "L'opération est DESTRUCTIVE."
+echo
+echo "Méthode : NVMe Cryptographic Erase (SES=2)"
+echo
+echo "Les données présentes sur ce disque seront détruites."
 echo
 
-read -r -p "Tapez encore une fois EFFACER pour lancer : " CONFIRMATION
+read -r -p "Tape exactement EFFACER pour continuer : " CONFIRM
 
-if [ "$CONFIRMATION" != "EFFACER" ]; then
+if [ "$CONFIRM" != "EFFACER" ]; then
+    echo
     echo "Annulation."
     exit 0
 fi
 
 echo
-echo ">>> SANITIZE EN COURS..."
-echo ">>> NE PAS ÉTEINDRE LE PC."
+echo "Dernière confirmation."
+echo
+read -r -p "Tape encore EFFACER pour lancer le formatage : " CONFIRM2
+
+if [ "$CONFIRM2" != "EFFACER" ]; then
+    echo
+    echo "Annulation."
+    exit 0
+fi
+
+# --------------------------------------------------
+# Format NVMe Crypto Erase
+# --------------------------------------------------
+
+echo
+echo "[5/7] Lancement du Cryptographic Erase"
+echo
+echo "Commande :"
+echo
+echo "  nvme format $DISK --ses=2"
+echo
+echo "NE PAS ÉTEINDRE LE Raspberry Pi."
 echo
 
-if sudo nvme sanitize "$CTRL" --sanact=start-crypto-erase --wait; then
+if nvme format "$DISK" --ses=2; then
     echo
     echo "=================================================="
-    echo "SANITIZE TERMINÉ AVEC SUCCÈS"
+    echo "FORMATAGE NVMe TERMINÉ"
     echo "=================================================="
 else
     echo
     echo "=================================================="
-    echo "ERREUR : le Sanitize a échoué ou n'est pas supporté."
+    echo "ERREUR : le formatage NVMe a échoué."
     echo "=================================================="
-    echo
-    echo "Consultez le journal Sanitize avec :"
-    echo "  sudo nvme sanitize-log $CTRL"
-    echo
     exit 1
 fi
 
-echo
-echo "Vérification finale :"
-sudo nvme sanitize-log "$CTRL" || true
+# --------------------------------------------------
+# Vérification
+# --------------------------------------------------
 
 echo
-echo "Terminé."
+echo "[6/7] Vérification du NVMe"
+echo
+
+nvme list
+
+echo
+lsblk -o NAME,SIZE,MODEL,SERIAL,FSTYPE,MOUNTPOINTS "$DISK"
+
+# --------------------------------------------------
+# Nettoyage éventuel GPT / signatures
+# --------------------------------------------------
+
+echo
+echo "[7/7] Nettoyage des signatures restantes"
+echo
+
+if command -v wipefs >/dev/null 2>&1; then
+    wipefs -a "$DISK" || true
+fi
+
+if command -v sgdisk >/dev/null 2>&1; then
+    sgdisk --zap-all "$DISK" || true
+fi
+
+partprobe "$DISK" 2>/dev/null || true
+
+echo
+echo "=================================================="
+echo "              OPÉRATION TERMINÉE"
+echo "=================================================="
+echo
+echo "État final :"
+echo
+lsblk -o NAME,SIZE,MODEL,SERIAL,FSTYPE,MOUNTPOINTS "$DISK"
+
+echo
+echo "Le NVMe est maintenant prêt à être repartitionné."
+echo
 EOF
-
-chmod +x erase_nvme.sh
-sudo ./erase_nvme.sh
