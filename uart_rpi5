@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+
+import serial
+import time
+
+PORT = "/dev/serial0"
+BAUDRATE = 115200
+
+ser = serial.Serial(
+    port=PORT,
+    baudrate=BAUDRATE,
+    timeout=1
+)
+
+print("=== TEST UART Raspberry Pi 5 ===")
+print(f"Port : {PORT}")
+print(f"Vitesse : {BAUDRATE} bauds")
+print()
+print("Reliez TX et RX avec un jumper.")
+print("Ctrl+C pour quitter.")
+print()
+
+compteur = 0
+
+try:
+    while True:
+        compteur += 1
+        message = f"TEST UART {compteur}\r\n"
+
+        # Vide les anciennes données reçues
+        ser.reset_input_buffer()
+
+        # Envoie le message
+        ser.write(message.encode())
+        ser.flush()
+
+        # Attend la réponse
+        reponse = ser.readline().decode(errors="replace")
+
+        if reponse == message:
+            print(f"[OK] TX -> RX : {reponse.strip()}")
+        elif reponse:
+            print(f"[ERREUR] Reçu : {reponse.strip()}")
+        else:
+            print("[ERREUR] Aucun retour RX")
+
+        time.sleep(1)
+
+except KeyboardInterrupt:
+    print("\nTest arrêté.")
+
+finally:
+    ser.close()
